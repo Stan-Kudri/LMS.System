@@ -56,6 +56,6 @@ namespace LMS.System.Domain.Model.Task
         /// <summary>
         /// TestSubmission List.
         /// </summary>
-        public List<TestSubmission>? TestSubmissions { get; set; }
+        public List<TestSubmission> TestSubmissions { get; set; } = new List<TestSubmission>();
     }
 }

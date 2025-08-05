@@ -24,9 +24,9 @@ namespace LMS.System.Domain.DB.Configuration
             builder.Property(e => e.FirstName).IsRequired().HasColumnName("first_name").HasMaxLength(128);
             builder.Property(e => e.LastName).IsRequired().HasColumnName("last_name").HasMaxLength(128);
             builder.Property(e => e.UserRole).IsRequired()
-                                         .HasColumnName("role")
-                                         .HasDefaultValue(UserRole.Student)
-                                         .SmartEnumNameConversion();
+                                             .HasColumnName("role")
+                                             .HasDefaultValue(UserRole.Student)
+                                             .SmartEnumNameConversion();
         }
     }
 }

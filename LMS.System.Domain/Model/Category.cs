@@ -13,6 +13,6 @@ namespace LMS.System.Domain.Model
         /// <summary>
         /// Courses.
         /// </summary>
-        public List<Course>? Courses { get; set; } = new List<Course>();
+        public List<Course> Courses { get; set; } = new List<Course>();
     }
 }

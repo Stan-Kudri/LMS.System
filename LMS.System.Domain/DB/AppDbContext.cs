@@ -1,5 +1,6 @@
 using LMS.System.Domain.DB.Configuration;
 using LMS.System.Domain.Model;
+using LMS.System.Domain.Model.Dates;
 using LMS.System.Domain.Model.Task;
 using LMS.System.Domain.Model.Tests;
 using LMS.System.Domain.Model.Users;
@@ -10,9 +11,18 @@ namespace LMS.System.Domain.DB
     /// <summary>
     /// DbContext.
     /// </summary>
-    public class AppDbContext(DbContextOptions options)
+    public class AppDbContext(DbContextOptions options, IDateTimeProvider dateTimeProvider)
         : DbContext(options)
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AppDbContext"/> class.
+        /// </summary>
+        /// <param name="options">DbContextOptions.</param>
+        public AppDbContext(DbContextOptions options)
+            : this(options, new SystemDateTimeProvider())
+        {
+        }
+
         /// <summary>
         /// DBset User.
         /// </summary>
@@ -68,7 +78,7 @@ namespace LMS.System.Domain.DB
             var changedEntries = ChangeTracker.Entries()
                                               .Where(x => x.Entity is Entity && (x.State == EntityState.Added || x.State == EntityState.Modified));
 
-            var now = DateTime.UtcNow;
+            var now = dateTimeProvider.UtcNow;
             foreach (var entry in changedEntries)
             {
                 var entity = (Entity)entry.Entity;
@@ -77,10 +87,7 @@ namespace LMS.System.Domain.DB
                     entity.CreatedAt = now;
                 }
 
-                if (entry.State == EntityState.Modified)
-                {
-                    entity.UpdatedAt = now;
-                }
+                entity.UpdatedAt = now;
             }
         }
 

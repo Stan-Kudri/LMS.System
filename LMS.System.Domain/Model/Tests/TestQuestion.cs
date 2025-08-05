@@ -31,11 +31,11 @@ namespace LMS.System.Domain.Model.Tests
         /// <summary>
         /// Answer Options Test Question.
         /// </summary>
-        public List<TestAnswerOption>? AnswerOptions { get; set; } = new List<TestAnswerOption>();
+        public List<TestAnswerOption> AnswerOptions { get; set; } = new List<TestAnswerOption>();
 
         /// <summary>
         /// Test Submissions Test Question.
         /// </summary>
-        public List<TestSubmission>? TestSubmissions { get; set; } = new List<TestSubmission>();
+        public List<TestSubmission> TestSubmissions { get; set; } = new List<TestSubmission>();
     }
 }

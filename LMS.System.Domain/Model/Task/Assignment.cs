@@ -41,11 +41,11 @@ namespace LMS.System.Domain.Model.Task
         /// <summary>
         /// Tests Question.
         /// </summary>
-        public List<TestQuestion>? TestQuestions { get; set; } = new List<TestQuestion>();
+        public List<TestQuestion> TestQuestions { get; set; } = new List<TestQuestion>();
 
         /// <summary>
         /// Submissions.
         /// </summary>
-        public List<Submission>? Submissions { get; set; } = new List<Submission>();
+        public List<Submission> Submissions { get; set; } = new List<Submission>();
     }
 }

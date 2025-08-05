@@ -21,7 +21,7 @@ namespace LMS.System.Domain.Model
         /// <summary>
         /// Category ID course.
         /// </summary>
-        public required int CategoryId { get; set; }
+        public required Guid CategoryId { get; set; }
 
         /// <summary>
         /// Category course.
@@ -46,16 +46,16 @@ namespace LMS.System.Domain.Model
         /// <summary>
         /// Enrollments in courses.
         /// </summary>
-        public List<Enrollment>? Enrollments { get; set; } = new List<Enrollment>();
+        public List<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
         /// <summary>
         /// Lessons in courses.
         /// </summary>
-        public List<Lesson>? Lessons { get; set; } = new List<Lesson>();
+        public List<Lesson> Lessons { get; set; } = new List<Lesson>();
 
         /// <summary>
         /// Assignments in courses.
         /// </summary>
-        public List<Assignment>? Assignments { get; set; } = new List<Assignment>();
+        public List<Assignment> Assignments { get; set; } = new List<Assignment>();
     }
 }

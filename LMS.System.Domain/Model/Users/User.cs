@@ -36,16 +36,16 @@ namespace LMS.System.Domain.Model.Users
         /// <summary>
         /// Submissions user.
         /// </summary>
-        public List<Submission>? Submissions { get; set; }
+        public List<Submission> Submissions { get; set; } = new List<Submission>();
 
         /// <summary>
-        /// Role.
+        /// Enrollments.
         /// </summary>
-        public List<Enrollment>? Enrollments { get; set; }
+        public List<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 
         /// <summary>
-        /// Role.
+        /// Courses.
         /// </summary>
-        public List<Submission>? Role { get; set; }
+        public List<Course> Courses { get; set; } = new List<Course>();
     }
 }
