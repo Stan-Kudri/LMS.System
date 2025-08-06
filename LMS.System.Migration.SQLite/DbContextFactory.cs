@@ -4,18 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LMS.System.Migration.SQLite
 {
-    public class DbContextFactory(string connectionName, IDateTimeProvider dateTimeProvider)
+    public class DbContextFactory(string connectionName, ISystemClock dateTimeProvider)
     {
         public AppDbContext Create()
         {
-            var builder = new DbContextOptionsBuilder<AppDbContext>().UseSqlite($"Data Source={connectionName}.db", x =>
-            {
-                x.MigrationsAssembly(typeof(DbContextFactoryMigration).Assembly.FullName);
-            });
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                                .UseSqlite($"Data Source={connectionName}.db")
+                                .Options;
 
-            var dbContext = new AppDbContext(builder.Options, dateTimeProvider);
-            dbContext.Migrate();
-
+            var dbContext = new AppDbContext(options, dateTimeProvider);
+            dbContext.Database.Migrate();
             return dbContext;
         }
     }

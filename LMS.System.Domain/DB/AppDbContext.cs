@@ -11,7 +11,7 @@ namespace LMS.System.Domain.DB
     /// <summary>
     /// DbContext.
     /// </summary>
-    public class AppDbContext(DbContextOptions options, IDateTimeProvider dateTimeProvider)
+    public class AppDbContext(DbContextOptions options, ISystemClock dateTimeProvider)
         : DbContext(options)
     {
         /// <summary>

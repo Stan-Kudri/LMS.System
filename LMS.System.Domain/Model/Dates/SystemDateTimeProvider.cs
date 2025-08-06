@@ -3,7 +3,7 @@ namespace LMS.System.Domain.Model.Dates
     /// <summary>
     /// Default interface implementation.
     /// </summary>
-    public class SystemDateTimeProvider : IDateTimeProvider
+    public class SystemDateTimeProvider : ISystemClock
     {
         /// <summary>
         /// Current date.

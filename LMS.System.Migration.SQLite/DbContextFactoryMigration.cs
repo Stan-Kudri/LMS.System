@@ -10,11 +10,11 @@ namespace LMS.System.Migration.SQLite
 
         public AppDbContext CreateDbContext(string[] args)
         {
-            var builder = new DbContextOptionsBuilder().UseSqlite(
-                $"Data Source={ConnectionName}.db",
-                b => b.MigrationsAssembly(typeof(DbContextFactoryMigration).Assembly.FullName));
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                                .UseSqlite($"Data Source={ConnectionName}.db")
+                                .Options;
 
-            return new AppDbContext(builder.Options);
+            return new AppDbContext(options);
         }
     }
 }

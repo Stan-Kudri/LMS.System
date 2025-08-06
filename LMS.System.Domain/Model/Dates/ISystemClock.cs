@@ -9,7 +9,7 @@ namespace LMS.System.Domain.Model.Dates
     /// <summary>
     /// Interface for get the current date.
     /// </summary>
-    public interface IDateTimeProvider
+    public interface ISystemClock
     {
         /// <summary>
         ///  Current date.
