@@ -1,25 +1,63 @@
-﻿@inherits LayoutComponentBase
+﻿@using LMS.System.Blazor.Authenticate
+@using LMS.System.Domain.Enums
+@using LMS.System.Domain.Model.Users
+@using Microsoft.AspNetCore.Components.Authorization
+@using global::System.Security.Claims
+
+@inherits LayoutComponentBase
+
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
-<MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
-        <MudSpacer/>
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>
-    </MudAppBar>
-    <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu/>
-    </MudDrawer>
-    <MudMainContent Class="pt-16 pa-4">
-        @Body
-    </MudMainContent>
-</MudLayout>
 
+<AuthorizeView>
+    <Authorized>
+        <MudLayout>
+            <MudAppBar Elevation="1">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+                <MudText Typo="Typo.h5" Class="ml-3">LMS System</MudText>
+                <MudSpacer/>
+                
+                @if (user != null)
+                {
+                    <MudText Typo="Typo.body1" Class="mr-3">Welcome, @user.FirstName!</MudText>
+                    <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                        <MudMenuItem Icon="@Icons.Material.Filled.Person" Href="/profile">Profile</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="Logout">Logout</MudMenuItem>
+                    </MudMenu>
+                }
+                
+                <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
+            </MudAppBar>
+            
+            <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+                <NavMenu UserRole="@user?.UserRole"/>
+            </MudDrawer>
+            
+            <MudMainContent Class="pt-16 pa-4">
+                @Body
+            </MudMainContent>
+        </MudLayout>
+    </Authorized>
+    <NotAuthorized>
+        <MudContainer Class="mt-16">
+            <MudCard>
+                <MudCardContent>
+                    <MudText Typo="Typo.h5" Align="Align.Center">Authentication Required</MudText>
+                    <MudText Align="Align.Center" Class="mt-3">Please log in to access the application.</MudText>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" 
+                               OnClick="RedirectToLogin" Class="mt-4">
+                        Go to Login
+                    </MudButton>
+                </MudCardContent>
+            </MudCard>
+        </MudContainer>
+    </NotAuthorized>
+</AuthorizeView>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
@@ -31,17 +69,37 @@
     private bool _drawerOpen = true;
     private bool _isDarkMode = true;
     private MudTheme? _theme = null;
+    private User? user;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
-
         _theme = new()
         {
             PaletteLight = _lightPalette,
             PaletteDark = _darkPalette,
             LayoutProperties = new LayoutProperties()
         };
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            // You can extract user info from claims here
+            var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                // In a real app, you'd fetch the user from your service
+                user = new User
+				{  
+					// Default value from claims
+                    Id = userId,
+                    FirstName = authState.User.FindFirst(ClaimTypes.GivenName)?.Value ?? "User",
+                    LastName = authState.User.FindFirst(ClaimTypes.Surname)?.Value ?? "",
+                    Email = authState.User.FindFirst(ClaimTypes.Email)?.Value ?? "",
+                    UserRole = UserRole.Student,
+					PasswordHash = string.Empty, 
+                };
+            }
+        }
     }
 
     private void DrawerToggle()
@@ -52,6 +110,20 @@
     private void DarkModeToggle()
     {
         _isDarkMode = !_isDarkMode;
+    }
+
+    private void Logout()
+    {
+        if (AuthStateProvider is CookieAuthStateProvider cookieAuth)
+        {
+            cookieAuth.ClearAuthCookies();
+        }
+        Navigation.NavigateTo("/login", true);
+    }
+
+    private void RedirectToLogin()
+    {
+        Navigation.NavigateTo("/login");
     }
 
     private readonly PaletteLight _lightPalette = new()
@@ -98,5 +170,4 @@
         true => Icons.Material.Rounded.AutoMode,
         false => Icons.Material.Outlined.DarkMode,
     };
-
 }

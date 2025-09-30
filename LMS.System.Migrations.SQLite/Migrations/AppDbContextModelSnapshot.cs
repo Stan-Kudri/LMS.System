@@ -3,19 +3,16 @@ using System;
 using LMS.System.Domain.DB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace LMS.System.Migration.SQLite.Migrations
+namespace LMS.System.Migrations.SQLite.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250805204309_nitialreate")]
-    partial class nitialreate
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -28,10 +25,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -40,10 +35,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("name");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -65,10 +58,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("category_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -93,10 +84,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("title");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -128,15 +117,12 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("course_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTime>("EnrollmentDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue(new DateTime(2025, 8, 5, 20, 43, 8, 741, DateTimeKind.Utc).AddTicks(9541))
                         .HasColumnName("enrollement_date");
 
                     b.Property<Guid>("StudentId")
@@ -144,10 +130,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("student_id");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -175,10 +159,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("course_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<int>("Order")
                         .ValueGeneratedOnAdd()
@@ -199,10 +181,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("lesson_type");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -223,9 +203,7 @@ namespace LMS.System.Migration.SQLite.Migrations
 
                     b.Property<string>("AssignmentType")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue("Text")
                         .HasColumnName("assignment_type");
 
                     b.Property<Guid>("CourseId")
@@ -233,15 +211,12 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("course_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<DateTime>("Deadline")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue(new DateTime(2025, 8, 5, 20, 43, 8, 713, DateTimeKind.Utc).AddTicks(9408))
                         .HasColumnName("enrollement_date");
 
                     b.Property<string>("Description")
@@ -256,10 +231,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("title");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -289,10 +262,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("assignment_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Feedback")
                         .IsRequired()
@@ -317,14 +288,11 @@ namespace LMS.System.Migration.SQLite.Migrations
                     b.Property<DateTime>("SubmittedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue(new DateTime(2025, 8, 5, 20, 43, 8, 732, DateTimeKind.Utc).AddTicks(3114))
                         .HasColumnName("submitted_at");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -343,10 +311,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<bool>("IsCorrect")
                         .ValueGeneratedOnAdd()
@@ -365,10 +331,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("test_question_id");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -389,10 +353,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("assignment_id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("QuestionText")
                         .IsRequired()
@@ -408,10 +370,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("question_type");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -428,10 +388,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<Guid>("SelectedOptionId")
                         .HasColumnType("TEXT")
@@ -446,10 +404,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("test_question_id");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 
@@ -462,6 +418,51 @@ namespace LMS.System.Migration.SQLite.Migrations
                     b.ToTable("test_submission", (string)null);
                 });
 
+            modelBuilder.Entity("LMS.System.Domain.Model.Users.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("Expires")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("expires");
+
+                    b.Property<bool>("IsRevoked")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_revoked");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("token");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("refresh_token", (string)null);
+                });
+
             modelBuilder.Entity("LMS.System.Domain.Model.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -470,10 +471,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -500,10 +499,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                         .HasColumnName("password_hash");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("TEXT")
-                        .HasColumnName("update_at")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnName("updated_at");
 
                     b.Property<string>("UserRole")
                         .IsRequired()
@@ -648,6 +645,17 @@ namespace LMS.System.Migration.SQLite.Migrations
                     b.Navigation("TestQuestion");
                 });
 
+            modelBuilder.Entity("LMS.System.Domain.Model.Users.RefreshToken", b =>
+                {
+                    b.HasOne("LMS.System.Domain.Model.Users.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LMS.System.Domain.Model.Category", b =>
                 {
                     b.Navigation("Courses");
@@ -686,6 +694,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                     b.Navigation("Courses");
 
                     b.Navigation("Enrollments");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("Submissions");
                 });

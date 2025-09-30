@@ -1,0 +1,111 @@
+﻿@page "/login"
+
+@using LMS.System.Blazor.Authenticate
+@using LMS.System.Domain.Service
+@using Microsoft.AspNetCore.Components
+
+@inject NavigationManager Navigation
+@inject CookieAuthStateProvider AuthStateProvider
+@inject AuthService AuthService
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+	<MudCard>
+		<MudCardContent>
+			<MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Login</MudText>
+
+			<EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+				<MudTextField @bind-Value="loginModel.Email"
+							  Label="Email"
+							  For="@(() => loginModel.Email)"
+							  Variant="Variant.Outlined"
+							  Required="true"
+							  Class="mb-3" />
+
+				<MudTextField @bind-Value="loginModel.Password"
+							  Label="Password"
+							  For="@(() => loginModel.Password)"
+							  Variant="Variant.Outlined"
+							  InputType="InputType.Password"
+							  Required="true"
+							  Class="mb-3" />
+
+				@if (!string.IsNullOrEmpty(errorMessage))
+				{
+					<MudAlert Severity="Severity.Error" Class="mb-3">@errorMessage</MudAlert>
+				}
+
+				<MudButton ButtonType="ButtonType.Submit"
+						   Variant="Variant.Filled"
+						   Color="Color.Primary"
+						   FullWidth="true"
+						   Disabled="isLoading">
+					@if (isLoading)
+					{
+						<MudProgressCircular Size="Size.Small" Indeterminate="true" />
+						<MudText Class="ml-2">Logging in...</MudText>
+					}
+					else
+					{
+						<MudText>Login</MudText>
+					}
+				</MudButton>
+			</EditForm>
+
+			<MudText Align="Align.Center" Class="mt-3">
+				Don't have an account? <MudLink Href="/register">Register here</MudLink>
+			</MudText>
+		</MudCardContent>
+	</MudCard>
+</MudContainer>
+
+@code {
+	private LoginModel loginModel = new();
+	private string errorMessage = string.Empty;
+	private bool isLoading = false;
+
+	protected override void OnInitialized()
+	{
+		// Redirect if already authenticated
+		var httpContext = new HttpContextAccessor().HttpContext;
+		if (httpContext?.Request.Cookies.ContainsKey("accessToken") == true)
+		{
+			Navigation.NavigateTo("/");
+		}
+	}
+
+	private async Task HandleLogin()
+	{
+		isLoading = true;
+		errorMessage = string.Empty;
+		StateHasChanged();
+
+		try
+		{
+			var result = await AuthService.LoginAsync(loginModel.Email, loginModel.Password);
+			if (result != null)
+			{
+				AuthStateProvider.MarkUserAsAuthenticated(result.AccessToken, result.RefreshToken);
+				Navigation.NavigateTo("/", true);
+			}
+			else
+			{
+				errorMessage = "Invalid email or password";
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = "An error occurred during login";
+		}
+		finally
+		{
+			isLoading = false;
+			StateHasChanged();
+		}
+	}
+
+	private class LoginModel
+	{
+		public string Email { get; set; } = string.Empty;
+		public string Password { get; set; } = string.Empty;
+	}
+}

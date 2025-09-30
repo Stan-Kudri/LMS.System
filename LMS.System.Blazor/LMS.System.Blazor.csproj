@@ -13,6 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
         <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,5 +23,12 @@
 
     <ItemGroup>
         <PackageReference Include="MudBlazor" Version="8.*" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\LMS.System.Domain\LMS.System.Domain.csproj" />
+      <ProjectReference Include="..\LMS.System.Migrations.SQLite\LMS.System.Migrations.SQLite.csproj" />
     </ItemGroup>
 </Project>
