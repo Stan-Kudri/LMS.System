@@ -1,8 +1,14 @@
 ﻿@page "/register"
+
+@attribute [AllowAnonymous]
+@layout AuthLayout
+
 @using LMS.System.Domain.Enums
 @using LMS.System.Domain.Model.Users
 @using LMS.System.Domain.Service
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject AuthService AuthService
 @inject NavigationManager Navigation
@@ -101,13 +107,18 @@
 	private bool isLoading = false;
 	private List<UserRole> availableRoles = new() { UserRole.Student, UserRole.Teacher };
 
-	protected override void OnInitialized()
+	[CascadingParameter]
+	private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+	protected override async Task OnInitializedAsync()
 	{
-		// Redirect if already authenticated
-		var httpContext = new HttpContextAccessor().HttpContext;
-		if (httpContext?.Request.Cookies.ContainsKey("accessToken") == true)
+		if (AuthenticationStateTask != null)
 		{
-			Navigation.NavigateTo("/");
+			var authState = await AuthenticationStateTask;
+			if (authState.User.Identity?.IsAuthenticated == true)
+			{
+				Navigation.NavigateTo("/");
+			}
 		}
 	}
 

@@ -9,165 +9,205 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 
-<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode"/>
-<MudPopoverProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
+<CascadingAuthenticationState>
+	<AuthorizeView>
+		<Authorized>
+			<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
+			<MudPopoverProvider />
+			<MudDialogProvider />
+			<MudSnackbarProvider />
 
-<AuthorizeView>
-    <Authorized>
-        <MudLayout>
-            <MudAppBar Elevation="1">
-                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
-                <MudText Typo="Typo.h5" Class="ml-3">LMS System</MudText>
-                <MudSpacer/>
-                
-                @if (user != null)
-                {
-                    <MudText Typo="Typo.body1" Class="mr-3">Welcome, @user.FirstName!</MudText>
-                    <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
-                        <MudMenuItem Icon="@Icons.Material.Filled.Person" Href="/profile">Profile</MudMenuItem>
-                        <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="Logout">Logout</MudMenuItem>
-                    </MudMenu>
-                }
-                
-                <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle"/>
-            </MudAppBar>
-            
-            <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-                <NavMenu UserRole="@user?.UserRole"/>
-            </MudDrawer>
-            
-            <MudMainContent Class="pt-16 pa-4">
-                @Body
-            </MudMainContent>
-        </MudLayout>
-    </Authorized>
-    <NotAuthorized>
-        <MudContainer Class="mt-16">
-            <MudCard>
-                <MudCardContent>
-                    <MudText Typo="Typo.h5" Align="Align.Center">Authentication Required</MudText>
-                    <MudText Align="Align.Center" Class="mt-3">Please log in to access the application.</MudText>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" 
-                               OnClick="RedirectToLogin" Class="mt-4">
-                        Go to Login
-                    </MudButton>
-                </MudCardContent>
-            </MudCard>
-        </MudContainer>
-    </NotAuthorized>
-</AuthorizeView>
+			<MudLayout>
+				<MudAppBar Elevation="1">
+					<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+					<MudText Typo="Typo.h5" Class="ml-3">LMS System</MudText>
+					<MudSpacer />
+
+					@if (user != null)
+					{
+						<MudText Typo="Typo.body1" Class="mr-3">Welcome, @user.FirstName!</MudText>
+						<MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+							<MudMenuItem Icon="@Icons.Material.Filled.Person" Href="/profile">Profile</MudMenuItem>
+							<MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="Logout">Logout</MudMenuItem>
+						</MudMenu>
+					}
+
+					<MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
+				</MudAppBar>
+
+				<MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+					<NavMenu UserRole="@user?.UserRole" />
+				</MudDrawer>
+
+				<MudMainContent Class="pt-16 pa-4">
+					@Body
+				</MudMainContent>
+			</MudLayout>
+		</Authorized>
+		<NotAuthorized>
+			<MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
+			<MudPopoverProvider />
+			<MudDialogProvider />
+			<MudSnackbarProvider />
+
+			<MudContainer Class="mt-16">
+				<MudCard>
+					<MudCardContent>
+						<MudText Typo="Typo.h5" Align="Align.Center">Authentication Required</MudText>
+						<MudText Align="Align.Center" Class="mt-3">Please log in to access the application.</MudText>
+
+						<MudLink Href="/login">
+							<MudButton Variant="Variant.Filled"
+									   Color="Color.Primary"
+									   FullWidth="true"
+									   Class="mt-4">
+								Go to Login
+							</MudButton>
+						</MudLink>
+
+						<MudLink Href="/register">
+							<MudButton Variant="Variant.Filled"
+									   Color="Color.Primary"
+									   FullWidth="true"
+									   Class="mt-4">
+								Go to Registration
+							</MudButton>
+						</MudLink>
+					</MudCardContent>
+				</MudCard>
+			</MudContainer>
+		</NotAuthorized>
+	</AuthorizeView>
+</CascadingAuthenticationState>
 
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
+	An unhandled error has occurred.
+	<a href="." class="reload">Reload</a>
+	<span class="dismiss">🗙</span>
 </div>
 
 @code {
-    private bool _drawerOpen = true;
-    private bool _isDarkMode = true;
-    private MudTheme? _theme = null;
-    private User? user;
+	private bool _drawerOpen = true;
+	private bool _isDarkMode = true;
+	private MudTheme? _theme = null;
+	private User? user;
 
-    protected override async Task OnInitializedAsync()
-    {
-        _theme = new()
-        {
-            PaletteLight = _lightPalette,
-            PaletteDark = _darkPalette,
-            LayoutProperties = new LayoutProperties()
-        };
+	[CascadingParameter]
+	private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity?.IsAuthenticated == true)
-        {
-            // You can extract user info from claims here
-            var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
-            {
-                // In a real app, you'd fetch the user from your service
-                user = new User
-				{  
-					// Default value from claims
-                    Id = userId,
-                    FirstName = authState.User.FindFirst(ClaimTypes.GivenName)?.Value ?? "User",
-                    LastName = authState.User.FindFirst(ClaimTypes.Surname)?.Value ?? "",
-                    Email = authState.User.FindFirst(ClaimTypes.Email)?.Value ?? "",
-                    UserRole = UserRole.Student,
-					PasswordHash = string.Empty, 
-                };
-            }
-        }
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		_theme = new()
+		{
+			PaletteLight = _lightPalette,
+			PaletteDark = _darkPalette,
+			LayoutProperties = new LayoutProperties()
+		};
 
-    private void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
-    }
+		if (AuthenticationStateTask != null)
+		{
+			var authState = await AuthenticationStateTask;
+			Console.WriteLine($"User authenticated: {authState.User.Identity?.IsAuthenticated}");
 
-    private void DarkModeToggle()
-    {
-        _isDarkMode = !_isDarkMode;
-    }
+			if (authState.User.Identity?.IsAuthenticated == true)
+			{
+				var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+				if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
+				{
+					user = new User
+					{
+						Id = userId,
+						FirstName = authState.User.FindFirst(ClaimTypes.GivenName)?.Value ?? "User",
+						LastName = authState.User.FindFirst(ClaimTypes.Surname)?.Value ?? "",
+						Email = authState.User.FindFirst(ClaimTypes.Email)?.Value ?? "",
+						UserRole = UserRole.Student,
+						PasswordHash = string.Empty,
+					};
+					Console.WriteLine($"User loaded: {user.FirstName}");
+				}
+			}
+			else
+			{
+				Console.WriteLine("User not authenticated - showing NotAuthorized section");
+			}
+		}
+	}
 
-    private void Logout()
-    {
-        if (AuthStateProvider is CookieAuthStateProvider cookieAuth)
-        {
-            cookieAuth.ClearAuthCookies();
-        }
-        Navigation.NavigateTo("/login", true);
-    }
+	private void DrawerToggle()
+	{
+		_drawerOpen = !_drawerOpen;
+	}
 
-    private void RedirectToLogin()
-    {
-        Navigation.NavigateTo("/login");
-    }
+	private void DarkModeToggle()
+	{
+		_isDarkMode = !_isDarkMode;
+	}
 
-    private readonly PaletteLight _lightPalette = new()
-    {
-        Black = "#110e2d",
-        AppbarText = "#424242",
-        AppbarBackground = "rgba(255,255,255,0.8)",
-        DrawerBackground = "#ffffff",
-        GrayLight = "#e8e8e8",
-        GrayLighter = "#f9f9f9",
-    };
+	private void Logout()
+	{
+		if (AuthStateProvider is CookieAuthStateProvider cookieAuth)
+		{
+			cookieAuth.ClearAuthCookies();
+		}
+		Navigation.NavigateTo("/login", true);
+	}
 
-    private readonly PaletteDark _darkPalette = new()
-    {
-        Primary = "#7e6fff",
-        Surface = "#1e1e2d",
-        Background = "#1a1a27",
-        BackgroundGray = "#151521",
-        AppbarText = "#92929f",
-        AppbarBackground = "rgba(26,26,39,0.8)",
-        DrawerBackground = "#1a1a27",
-        ActionDefault = "#74718e",
-        ActionDisabled = "#9999994d",
-        ActionDisabledBackground = "#605f6d4d",
-        TextPrimary = "#b2b0bf",
-        TextSecondary = "#92929f",
-        TextDisabled = "#ffffff33",
-        DrawerIcon = "#92929f",
-        DrawerText = "#92929f",
-        GrayLight = "#2a2833",
-        GrayLighter = "#1e1e2d",
-        Info = "#4a86ff",
-        Success = "#3dcb6c",
-        Warning = "#ffb545",
-        Error = "#ff3f5f",
-        LinesDefault = "#33323e",
-        TableLines = "#33323e",
-        Divider = "#292838",
-        OverlayLight = "#1e1e2d80",
-    };
+	private void RedirectToLogin()
+	{
+		Console.WriteLine("Redirecting to login...");
+		Navigation.NavigateTo("/login");
+		StateHasChanged();
+	}
 
-    public string DarkLightModeButtonIcon => _isDarkMode switch
-    {
-        true => Icons.Material.Rounded.AutoMode,
-        false => Icons.Material.Outlined.DarkMode,
-    };
+	private void RedirectToRegistration()
+	{
+		Console.WriteLine("Redirecting to registration...");
+		Navigation.NavigateTo("/register");
+		StateHasChanged();
+	}
+
+	private readonly PaletteLight _lightPalette = new()
+	{
+		Black = "#110e2d",
+		AppbarText = "#424242",
+		AppbarBackground = "rgba(255,255,255,0.8)",
+		DrawerBackground = "#ffffff",
+		GrayLight = "#e8e8e8",
+		GrayLighter = "#f9f9f9",
+	};
+
+	private readonly PaletteDark _darkPalette = new()
+	{
+		Primary = "#7e6fff",
+		Surface = "#1e1e2d",
+		Background = "#1a1a27",
+		BackgroundGray = "#151521",
+		AppbarText = "#92929f",
+		AppbarBackground = "rgba(26,26,39,0.8)",
+		DrawerBackground = "#1a1a27",
+		ActionDefault = "#74718e",
+		ActionDisabled = "#9999994d",
+		ActionDisabledBackground = "#605f6d4d",
+		TextPrimary = "#b2b0bf",
+		TextSecondary = "#92929f",
+		TextDisabled = "#ffffff33",
+		DrawerIcon = "#92929f",
+		DrawerText = "#92929f",
+		GrayLight = "#2a2833",
+		GrayLighter = "#1e1e2d",
+		Info = "#4a86ff",
+		Success = "#3dcb6c",
+		Warning = "#ffb545",
+		Error = "#ff3f5f",
+		LinesDefault = "#33323e",
+		TableLines = "#33323e",
+		Divider = "#292838",
+		OverlayLight = "#1e1e2d80",
+	};
+
+	public string DarkLightModeButtonIcon => _isDarkMode switch
+	{
+		true => Icons.Material.Rounded.AutoMode,
+		false => Icons.Material.Outlined.DarkMode,
+	};
 }

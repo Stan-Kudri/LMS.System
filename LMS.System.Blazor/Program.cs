@@ -1,5 +1,6 @@
 using LMS.System.Blazor.Authenticate;
 using LMS.System.Blazor.Components;
+using LMS.System.Blazor.Components.Pages.Users;
 using LMS.System.Domain.DB;
 using LMS.System.Domain.Model.Users;
 using LMS.System.Domain.Service;
@@ -17,6 +18,7 @@ builder.Services.AddMudServices();
 // Add services to the container.
 builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+builder.Services.AddRazorPages();
 
 // Add Entity Framework
 builder.Services.AddSingleton(e => new DbContextFactory("DbSystemLMS", TimeProvider.System));
@@ -29,6 +31,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Strict;
+        options.LoginPath = "/login";
+        options.AccessDeniedPath = "/access-denied";
     });
 
 builder.Services.AddAuthorization();

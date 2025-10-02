@@ -1,8 +1,13 @@
 ﻿@page "/login"
 
+@attribute [AllowAnonymous]
+@layout AuthLayout
+
 @using LMS.System.Blazor.Authenticate
 @using LMS.System.Domain.Service
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject NavigationManager Navigation
 @inject CookieAuthStateProvider AuthStateProvider
@@ -63,13 +68,18 @@
 	private string errorMessage = string.Empty;
 	private bool isLoading = false;
 
-	protected override void OnInitialized()
+	[CascadingParameter]
+	private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+	protected override async Task OnInitializedAsync()
 	{
-		// Redirect if already authenticated
-		var httpContext = new HttpContextAccessor().HttpContext;
-		if (httpContext?.Request.Cookies.ContainsKey("accessToken") == true)
+		if (AuthenticationStateTask != null)
 		{
-			Navigation.NavigateTo("/");
+			var authState = await AuthenticationStateTask;
+			if (authState.User.Identity?.IsAuthenticated == true)
+			{
+				Navigation.NavigateTo("/");
+			}
 		}
 	}
 

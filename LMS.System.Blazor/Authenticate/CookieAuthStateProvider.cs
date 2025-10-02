@@ -2,6 +2,7 @@ using System.Security.Claims;
 using global::System.Security.Claims;
 using LMS.System.Domain.Service;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Configuration;
 
 namespace LMS.System.Blazor.Authenticate
 {
@@ -12,6 +13,7 @@ namespace LMS.System.Blazor.Authenticate
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AuthService _authService;
+        private readonly JwtTokenService _tokenService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CookieAuthStateProvider"/> class.
@@ -22,6 +24,12 @@ namespace LMS.System.Blazor.Authenticate
         {
             _httpContextAccessor = httpContextAccessor;
             _authService = authService;
+
+            // Create configuration and token service
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+            _tokenService = new JwtTokenService(configuration, TimeProvider.System);
         }
 
         /// <summary>
@@ -35,7 +43,6 @@ namespace LMS.System.Blazor.Authenticate
                 return new AuthenticationState(new ClaimsPrincipal());
             }
 
-            // Try to get access token from cookie
             var accessToken = httpContext.Request.Cookies["accessToken"];
             var refreshToken = httpContext.Request.Cookies["refreshToken"];
 
@@ -51,9 +58,7 @@ namespace LMS.System.Blazor.Authenticate
             }
             catch
             {
-                // Tokens are invalid, clear cookies
-                httpContext.Response.Cookies.Delete("accessToken");
-                httpContext.Response.Cookies.Delete("refreshToken");
+                ClearAuthCookies();
                 return new AuthenticationState(new ClaimsPrincipal());
             }
         }
@@ -63,28 +68,24 @@ namespace LMS.System.Blazor.Authenticate
         /// </summary>
         private async Task<ClaimsPrincipal> GetPrincipalFromTokensAsync(string accessToken, string refreshToken)
         {
-            var tokenService = new JwtTokenService(
-                new ConfigurationBuilder().AddJsonFile("appsettings.json").Build(),
-                TimeProvider.System);
-
-            var principal = tokenService.GetPrincipalFromExpiredToken(accessToken);
-            if (principal != null)
+            // First try to validate the access token
+            var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
+            if (principal != null && principal.Identity?.IsAuthenticated == true)
             {
                 return principal;
             }
 
-            // Try to refresh tokens
+            // If access token is invalid, try to refresh
             var authResult = await _authService.RefreshTokenAsync(accessToken, refreshToken);
             if (authResult != null)
             {
-                // Set new cookies
                 var httpContext = _httpContextAccessor.HttpContext;
                 if (httpContext != null)
                 {
                     SetAuthCookies(httpContext.Response, authResult.AccessToken, authResult.RefreshToken);
                 }
 
-                principal = tokenService.GetPrincipalFromExpiredToken(authResult.AccessToken);
+                principal = _tokenService.GetPrincipalFromExpiredToken(authResult.AccessToken);
             }
 
             return principal ?? new ClaimsPrincipal();
