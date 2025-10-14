@@ -8,6 +8,7 @@
 
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
+@inject HttpClient Http
 
 <CascadingAuthenticationState>
 	<AuthorizeView>
@@ -97,6 +98,7 @@
 
 	protected override async Task OnInitializedAsync()
 	{
+		// Initialize theme and load current user
 		_theme = new()
 		{
 			PaletteLight = _lightPalette,
@@ -104,6 +106,11 @@
 			LayoutProperties = new LayoutProperties()
 		};
 
+		await LoadCurrentUser();
+	}
+
+	private async Task LoadCurrentUser()
+	{
 		if (AuthenticationStateTask != null)
 		{
 			var authState = await AuthenticationStateTask;
@@ -111,19 +118,33 @@
 
 			if (authState.User.Identity?.IsAuthenticated == true)
 			{
-				var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
-				if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
+				try
 				{
-					user = new User
+					// Load user data from API endpoint
+					var response = await Http.GetAsync("api/auth/user");
+					if (response.IsSuccessStatusCode)
 					{
-						Id = userId,
-						FirstName = authState.User.FindFirst(ClaimTypes.GivenName)?.Value ?? "User",
-						LastName = authState.User.FindFirst(ClaimTypes.Surname)?.Value ?? "",
-						Email = authState.User.FindFirst(ClaimTypes.Email)?.Value ?? "",
-						UserRole = UserRole.Student,
-						PasswordHash = string.Empty,
-					};
-					Console.WriteLine($"User loaded: {user.FirstName}");
+						var userData = await response.Content.ReadFromJsonAsync<UserResponse>();
+						if (userData != null)
+						{
+							user = new User
+							{
+								Id = userData.Id,
+								FirstName = userData.FirstName,
+								LastName = userData.LastName,
+								Email = userData.Email,
+								UserRole = userData.Role,
+								PasswordHash = string.Empty,
+							};
+							Console.WriteLine($"User loaded: {user.FirstName}");
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine($"Error loading user: {ex.Message}");
+					// Fallback to claims if API call fails
+					SetUserFromClaims(authState.User);
 				}
 			}
 			else
@@ -131,6 +152,45 @@
 				Console.WriteLine("User not authenticated - showing NotAuthorized section");
 			}
 		}
+	}
+
+	// Fallback method to set user from authentication claims
+	private void SetUserFromClaims(ClaimsPrincipal principal)
+	{
+		var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+		if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
+		{
+			user = new User
+			{
+				Id = userId,
+				FirstName = principal.FindFirst(ClaimTypes.GivenName)?.Value ?? "User",
+				LastName = principal.FindFirst(ClaimTypes.Surname)?.Value ?? "",
+				Email = principal.FindFirst(ClaimTypes.Email)?.Value ?? "",
+				UserRole = UserRole.Student,
+				PasswordHash = string.Empty,
+			};
+			Console.WriteLine($"User loaded from claims: {user.FirstName}");
+		}
+	}
+
+	private async void Logout()
+	{
+		try
+		{
+			// Call API logout endpoint
+			await Http.PostAsync("api/auth/logout", null);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error during logout: {ex.Message}");
+		}
+
+		// Clear authentication cookies and redirect to login
+		if (AuthStateProvider is CookieAuthStateProvider cookieAuth)
+		{
+			cookieAuth.ClearAuthCookies();
+		}
+		Navigation.NavigateTo("/login", true);
 	}
 
 	private void DrawerToggle()
@@ -143,29 +203,7 @@
 		_isDarkMode = !_isDarkMode;
 	}
 
-	private void Logout()
-	{
-		if (AuthStateProvider is CookieAuthStateProvider cookieAuth)
-		{
-			cookieAuth.ClearAuthCookies();
-		}
-		Navigation.NavigateTo("/login", true);
-	}
-
-	private void RedirectToLogin()
-	{
-		Console.WriteLine("Redirecting to login...");
-		Navigation.NavigateTo("/login");
-		StateHasChanged();
-	}
-
-	private void RedirectToRegistration()
-	{
-		Console.WriteLine("Redirecting to registration...");
-		Navigation.NavigateTo("/register");
-		StateHasChanged();
-	}
-
+	// Light theme color palette
 	private readonly PaletteLight _lightPalette = new()
 	{
 		Black = "#110e2d",
@@ -176,6 +214,7 @@
 		GrayLighter = "#f9f9f9",
 	};
 
+	// Dark theme color palette
 	private readonly PaletteDark _darkPalette = new()
 	{
 		Primary = "#7e6fff",
@@ -205,9 +244,20 @@
 		OverlayLight = "#1e1e2d80",
 	};
 
+	// Dynamic icon for dark/light mode toggle
 	public string DarkLightModeButtonIcon => _isDarkMode switch
 	{
 		true => Icons.Material.Rounded.AutoMode,
 		false => Icons.Material.Outlined.DarkMode,
 	};
+
+	// Model for API user response
+	private class UserResponse
+	{
+		public Guid Id { get; set; }
+		public string Email { get; set; } = string.Empty;
+		public string FirstName { get; set; } = string.Empty;
+		public string LastName { get; set; } = string.Empty;
+		public UserRole Role { get; set; } = UserRole.Student;
+	}
 }

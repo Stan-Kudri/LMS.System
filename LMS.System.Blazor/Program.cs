@@ -18,6 +18,13 @@ builder.Services.AddMudServices();
 // Add services to the container.
 builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+builder.Services.AddHttpClient("AuthApi", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["BaseUrl"] ?? "https://localhost:7134/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
 builder.Services.AddRazorPages();
 
 // Add Entity Framework
@@ -37,6 +44,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddControllers();
 
 // Register custom services
 builder.Services.AddScoped<PasswordHasher>();
@@ -62,6 +70,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+app.MapControllers();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 // Clean up expired tokens on startup

@@ -8,10 +8,11 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Authorization
+@using global::System.Text.Json
 
 @inject NavigationManager Navigation
-@inject CookieAuthStateProvider AuthStateProvider
-@inject AuthService AuthService
+@inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthStateProvider
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
 	<MudCard>
@@ -64,7 +65,7 @@
 </MudContainer>
 
 @code {
-	private LoginModel loginModel = new();
+	private LoginRequest loginModel = new();
 	private string errorMessage = string.Empty;
 	private bool isLoading = false;
 
@@ -91,20 +92,31 @@
 
 		try
 		{
-			var result = await AuthService.LoginAsync(loginModel.Email, loginModel.Password);
-			if (result != null)
+			var client = HttpClientFactory.CreateClient("AuthApi");
+			var response = await client.PostAsJsonAsync("api/auth/login", loginModel);
+			var content = await response.Content.ReadAsStringAsync();
+
+			if (response.IsSuccessStatusCode)
 			{
-				AuthStateProvider.MarkUserAsAuthenticated(result.AccessToken, result.RefreshToken);
+				await AuthStateProvider.GetAuthenticationStateAsync();
 				Navigation.NavigateTo("/", true);
 			}
 			else
 			{
-				errorMessage = "Invalid email or password";
+				try
+				{
+					var errorResult = JsonSerializer.Deserialize<ErrorResponse>(content);
+					errorMessage = errorResult?.Message ?? $"Error: {response.StatusCode}";
+				}
+				catch
+				{
+					errorMessage = $"Login failed: {response.StatusCode}";
+				}
 			}
 		}
 		catch (Exception ex)
 		{
-			errorMessage = "An error occurred during login";
+			errorMessage = $"An error occurred during login: {ex.Message}";
 		}
 		finally
 		{
@@ -113,9 +125,9 @@
 		}
 	}
 
-	private class LoginModel
+	private class ErrorResponse
 	{
-		public string Email { get; set; } = string.Empty;
-		public string Password { get; set; } = string.Empty;
+		public string Message { get; set; } = string.Empty;
+		public string[] Errors { get; set; } = Array.Empty<string>();
 	}
 }
