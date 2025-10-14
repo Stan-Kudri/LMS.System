@@ -27,13 +27,11 @@ namespace LMS.System.Domain.DB.Configuration
                                                 .HasColumnName("description");
             builder.Property(e => e.Deadline).IsRequired()
                                              .HasColumnName("enrollement_date")
-                                             .ValueGeneratedOnAdd()
-                                             .HasDefaultValue(DateTime.UtcNow);
+                                             .ValueGeneratedOnAdd();
             builder.Property(e => e.CourseId).IsRequired()
                                              .HasColumnName("course_id");
             builder.Property(e => e.AssignmentType).IsRequired()
                                                    .HasColumnName("assignment_type")
-                                                   .HasDefaultValue(AssignmentType.Text)
                                                    .SmartEnumNameConversion();
 
             builder.HasMany(p => p.TestQuestions)

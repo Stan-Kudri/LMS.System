@@ -36,6 +36,11 @@ namespace LMS.System.Domain.Model.Users
         /// <summary>
         /// Submissions user.
         /// </summary>
+        public List<RefreshToken> RefreshTokens { get; set; } = new();
+
+        /// <summary>
+        /// Submissions user.
+        /// </summary>
         public List<Submission> Submissions { get; set; } = new List<Submission>();
 
         /// <summary>

@@ -36,7 +36,7 @@ namespace LMS.System.Domain.Model.Task
         /// <summary>
         /// Type assignment.
         /// </summary>
-        public required AssignmentType AssignmentType { get; set; }
+        public required AssignmentType AssignmentType { get; set; } = AssignmentType.Text;
 
         /// <summary>
         /// Tests Question.

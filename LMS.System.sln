@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36327.8 d17.14
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11012.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.System.Domain", "LMS.System.Domain\LMS.System.Domain.csproj", "{471E9CB3-8846-48C8-A253-C757879AA166}"
 EndProject
@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.System.Test", "LMS.Syst
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.System.Blazor", "LMS.System.Blazor\LMS.System.Blazor.csproj", "{A5535947-4C2E-4C1F-841E-DAE785289BDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.System.Migration.SQLite", "LMS.System.Migration.SQLite\LMS.System.Migration.SQLite.csproj", "{9F15535F-86F7-457E-91AC-F26E61977CF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LMS.System.Migrations.SQLite", "LMS.System.Migrations.SQLite\LMS.System.Migrations.SQLite.csproj", "{5B297353-7276-469A-B479-3022AACB78B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{A5535947-4C2E-4C1F-841E-DAE785289BDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5535947-4C2E-4C1F-841E-DAE785289BDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5535947-4C2E-4C1F-841E-DAE785289BDB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9F15535F-86F7-457E-91AC-F26E61977CF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F15535F-86F7-457E-91AC-F26E61977CF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F15535F-86F7-457E-91AC-F26E61977CF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F15535F-86F7-457E-91AC-F26E61977CF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B297353-7276-469A-B479-3022AACB78B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B297353-7276-469A-B479-3022AACB78B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B297353-7276-469A-B479-3022AACB78B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B297353-7276-469A-B479-3022AACB78B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

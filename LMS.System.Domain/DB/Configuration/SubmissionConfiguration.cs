@@ -30,8 +30,7 @@ namespace LMS.System.Domain.DB.Configuration
                                              .HasColumnName("feedback");
             builder.Property(e => e.SubmittedAt).IsRequired()
                                                 .HasColumnName("submitted_at")
-                                                .ValueGeneratedOnAdd()
-                                                .HasDefaultValue(DateTime.UtcNow);
+                                                .ValueGeneratedOnAdd();
             builder.Property(e => e.AssignmentId).IsRequired()
                                                  .HasColumnName("assignment_id");
             builder.Property(e => e.StudentId).IsRequired()

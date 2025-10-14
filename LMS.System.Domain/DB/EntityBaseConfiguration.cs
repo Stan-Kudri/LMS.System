@@ -21,11 +21,9 @@ namespace LMS.System.Domain.DB
             builder.Property(e => e.Id).HasColumnName("id")
                                        .ValueGeneratedOnAdd();
             builder.Property(e => e.CreatedAt).HasColumnName("created_at")
-                                              .HasDefaultValueSql("GETDATE()")
-                                              .ValueGeneratedOnAddOrUpdate();
-            builder.Property(e => e.UpdatedAt).HasColumnName("update_at")
-                                              .HasDefaultValueSql("GETDATE()")
-                                              .ValueGeneratedOnAddOrUpdate();
+                                              .ValueGeneratedNever();
+            builder.Property(e => e.UpdatedAt).HasColumnName("updated_at")
+                                              .ValueGeneratedNever();
             ConfigureModel(builder);
         }
 

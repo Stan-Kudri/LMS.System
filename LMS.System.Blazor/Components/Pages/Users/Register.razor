@@ -1,0 +1,180 @@
+﻿@page "/register"
+
+@attribute [AllowAnonymous]
+@layout AuthLayout
+
+@using LMS.System.Domain.Enums
+@using LMS.System.Domain.Model.Users
+@using LMS.System.Domain.Service
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+	<MudCard>
+		<MudCardContent>
+			<MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">Register</MudText>
+
+			<EditForm Model="@registerModel" OnValidSubmit="@HandleRegister">
+				<MudTextField @bind-Value="registerModel.Email"
+							  Label="Email"
+							  For="@(() => registerModel.Email)"
+							  Variant="Variant.Outlined"
+							  Required="true"
+							  Class="mb-3" />
+
+				<MudTextField @bind-Value="registerModel.Password"
+							  Label="Password"
+							  For="@(() => registerModel.Password)"
+							  Variant="Variant.Outlined"
+							  InputType="InputType.Password"
+							  Required="true"
+							  Class="mb-3" />
+
+				<MudTextField @bind-Value="registerModel.ConfirmPassword"
+							  Label="Confirm Password"
+							  For="@(() => registerModel.ConfirmPassword)"
+							  Variant="Variant.Outlined"
+							  InputType="InputType.Password"
+							  Required="true"
+							  Class="mb-3" />
+
+				<MudTextField @bind-Value="registerModel.FirstName"
+							  Label="First Name"
+							  For="@(() => registerModel.FirstName)"
+							  Variant="Variant.Outlined"
+							  Required="true"
+							  Class="mb-3" />
+
+				<MudTextField @bind-Value="registerModel.LastName"
+							  Label="Last Name"
+							  For="@(() => registerModel.LastName)"
+							  Variant="Variant.Outlined"
+							  Required="true"
+							  Class="mb-3" />
+
+				<MudSelect @bind-Value="registerModel.UserRole"
+						   Label="Role"
+						   Variant="Variant.Outlined"
+						   Class="mb-3">
+					@foreach (var role in availableRoles)
+					{
+						<MudSelectItem Value="role">@role.Name</MudSelectItem>
+					}
+				</MudSelect>
+
+				@if (!string.IsNullOrEmpty(successMessage))
+				{
+					<MudAlert Severity="Severity.Success" Class="mb-3">@successMessage</MudAlert>
+				}
+
+				@if (!string.IsNullOrEmpty(errorMessage))
+				{
+					<MudAlert Severity="Severity.Error" Class="mb-3">@errorMessage</MudAlert>
+				}
+
+				<MudButton ButtonType="ButtonType.Submit"
+						   Variant="Variant.Filled"
+						   Color="Color.Primary"
+						   FullWidth="true"
+						   Disabled="isLoading">
+					@if (isLoading)
+					{
+						<MudProgressCircular Size="Size.Small" Indeterminate="true" />
+						<MudText Class="ml-2">Registering...</MudText>
+					}
+					else
+					{
+						<MudText>Register</MudText>
+					}
+				</MudButton>
+			</EditForm>
+
+			<MudText Align="Align.Center" Class="mt-3">
+				Already have an account? <MudLink Href="/login">Login here</MudLink>
+			</MudText>
+		</MudCardContent>
+	</MudCard>
+</MudContainer>
+
+@code {
+	private RegisterModel registerModel = new();
+	private string errorMessage = string.Empty;
+	private string successMessage = string.Empty;
+	private bool isLoading = false;
+	private List<UserRole> availableRoles = new() { UserRole.Student, UserRole.Teacher };
+
+	[CascadingParameter]
+	private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (AuthenticationStateTask != null)
+		{
+			var authState = await AuthenticationStateTask;
+			if (authState.User.Identity?.IsAuthenticated == true)
+			{
+				Navigation.NavigateTo("/");
+			}
+		}
+	}
+
+	private async Task HandleRegister()
+	{
+		if (registerModel.Password != registerModel.ConfirmPassword)
+		{
+			errorMessage = "Passwords do not match";
+			return;
+		}
+
+		isLoading = true;
+		errorMessage = string.Empty;
+		successMessage = string.Empty;
+		StateHasChanged();
+
+		try
+		{
+			var userRequest = new UserRequest
+			{
+				Email = registerModel.Email,
+				Password = registerModel.Password,
+				FirstName = registerModel.FirstName,
+				LastName = registerModel.LastName,
+				UserRole = registerModel.UserRole
+			};
+
+			var result = await AuthService.RegisterAsync(userRequest);
+			if (result != null)
+			{
+				successMessage = "Registration successful! You can now login.";
+				registerModel = new RegisterModel();
+			}
+			else
+			{
+				errorMessage = "Email already exists";
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = "An error occurred during registration";
+		}
+		finally
+		{
+			isLoading = false;
+			StateHasChanged();
+		}
+	}
+
+	private class RegisterModel
+	{
+		public string Email { get; set; } = string.Empty;
+		public string Password { get; set; } = string.Empty;
+		public string ConfirmPassword { get; set; } = string.Empty;
+		public string FirstName { get; set; } = string.Empty;
+		public string LastName { get; set; } = string.Empty;
+		public UserRole UserRole { get; set; } = UserRole.Student;
+	}
+}

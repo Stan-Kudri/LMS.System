@@ -31,5 +31,11 @@ namespace LMS.System.Domain.Enums
             : base(name, value)
         {
         }
+
+        // Ef constructors
+        private LessonType()
+            : base(string.Empty, 0)
+        {
+        }
     }
 }

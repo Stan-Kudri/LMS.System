@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace LMS.System.Migration.SQLite.Migrations
+namespace LMS.System.Migrations.SQLite.Migrations
 {
     /// <inheritdoc />
-    public partial class nitialreate : Migration
+    public partial class InitCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,8 +17,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                 {
                     id = table.Column<Guid>(type: "TEXT", nullable: false),
                     name = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -35,8 +35,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                     first_name = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
                     last_name = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
                     role = table.Column<string>(type: "TEXT", nullable: false, defaultValue: "Student"),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -53,8 +53,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                     category_id = table.Column<Guid>(type: "TEXT", nullable: false),
                     instructor_id = table.Column<Guid>(type: "TEXT", nullable: false),
                     is_published = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,17 +74,40 @@ namespace LMS.System.Migration.SQLite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "refresh_token",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    token = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    expires = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    is_revoked = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
+                    user_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_refresh_token", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_refresh_token_user_user_id",
+                        column: x => x.user_id,
+                        principalTable: "user",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "assignment",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "TEXT", nullable: false),
                     title = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
                     description = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    enrollement_date = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValue: new DateTime(2025, 8, 5, 20, 43, 8, 713, DateTimeKind.Utc).AddTicks(9408)),
+                    enrollement_date = table.Column<DateTime>(type: "TEXT", nullable: false),
                     course_id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    assignment_type = table.Column<string>(type: "TEXT", nullable: false, defaultValue: "Text"),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    assignment_type = table.Column<string>(type: "TEXT", nullable: false),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -102,12 +125,12 @@ namespace LMS.System.Migration.SQLite.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    enrollement_date = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValue: new DateTime(2025, 8, 5, 20, 43, 8, 741, DateTimeKind.Utc).AddTicks(9541)),
+                    enrollement_date = table.Column<DateTime>(type: "TEXT", nullable: false),
                     is_completed = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
                     student_id = table.Column<Guid>(type: "TEXT", nullable: false),
                     course_id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -136,8 +159,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                     course_id = table.Column<Guid>(type: "TEXT", nullable: false),
                     order = table.Column<int>(type: "INTEGER", nullable: false),
                     lesson_type = table.Column<string>(type: "TEXT", nullable: false, defaultValue: "Text"),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -159,11 +182,11 @@ namespace LMS.System.Migration.SQLite.Migrations
                     file_path = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
                     grade = table.Column<byte>(type: "INTEGER", nullable: false),
                     feedback = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    submitted_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValue: new DateTime(2025, 8, 5, 20, 43, 8, 732, DateTimeKind.Utc).AddTicks(3114)),
+                    submitted_at = table.Column<DateTime>(type: "TEXT", nullable: false),
                     assignment_id = table.Column<Guid>(type: "TEXT", nullable: false),
                     student_id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -190,8 +213,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                     question_text = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
                     question_type = table.Column<string>(type: "TEXT", nullable: false, defaultValue: "Single Choice"),
                     assignment_id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -212,8 +235,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                     option_text = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
                     is_correct = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: true),
                     test_question_id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -234,8 +257,8 @@ namespace LMS.System.Migration.SQLite.Migrations
                     test_question_id = table.Column<Guid>(type: "TEXT", nullable: false),
                     submission_id = table.Column<Guid>(type: "TEXT", nullable: false),
                     selected_option_id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()"),
-                    update_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "GETDATE()")
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -315,6 +338,17 @@ namespace LMS.System.Migration.SQLite.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_refresh_token_token",
+                table: "refresh_token",
+                column: "token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_refresh_token_user_id",
+                table: "refresh_token",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_submission_assignment_id",
                 table: "submission",
                 column: "assignment_id");
@@ -364,6 +398,9 @@ namespace LMS.System.Migration.SQLite.Migrations
 
             migrationBuilder.DropTable(
                 name: "lesson");
+
+            migrationBuilder.DropTable(
+                name: "refresh_token");
 
             migrationBuilder.DropTable(
                 name: "test_submission");

@@ -26,8 +26,7 @@ namespace LMS.System.Domain.DB
                                              .HasColumnName("course_id");
             builder.Property(e => e.EnrollmentDate).IsRequired()
                                                    .HasColumnName("enrollement_date")
-                                                   .ValueGeneratedOnAdd()
-                                                   .HasDefaultValue(DateTime.UtcNow);
+                                                   .ValueGeneratedOnAdd();
 
             builder.HasOne(e => e.Student)
                    .WithMany(e => e.Enrollments)

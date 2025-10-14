@@ -1,0 +1,19 @@
+﻿@page "/access-denied"
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+	<MudCard>
+		<MudCardContent>
+			<MudText Typo="Typo.h4" Align="Align.Center" Color="Color.Error" Class="mb-4">
+				<MudIcon Icon="@Icons.Material.Filled.Warning" Class="mr-2" />
+				Access Denied
+			</MudText>
+			<MudText Align="Align.Center" Class="mb-4">
+				You don't have permission to access this resource.
+			</MudText>
+			<MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true"
+					   Href="/" Link="true" StartIcon="@Icons.Material.Filled.Home">
+				Go to Home
+			</MudButton>
+		</MudCardContent>
+	</MudCard>
+</MudContainer>
