@@ -95,6 +95,30 @@ namespace LMS.System.Blazor.Authenticate
         }
 
         /// <summary>
+        /// Clear authentication cookies (logout).
+        /// </summary>
+        public void ClearAuthCookies()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext != null)
+            {
+                // Revoke refresh token from database
+                var refreshToken = httpContext.Request.Cookies[AuthConst.RefreshToken];
+                if (!string.IsNullOrEmpty(refreshToken))
+                {
+                    _ = _authService.RevokeRefreshTokenAsync(refreshToken);
+                }
+
+                // Remove cookies from response
+                httpContext.Response.Cookies.Delete(AuthConst.AccessToken);
+                httpContext.Response.Cookies.Delete(AuthConst.RefreshToken);
+            }
+
+            // Notify authentication state change
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        }
+
+        /// <summary>
         /// Set authentication cookies in HTTP response.
         /// </summary>
         /// <param name="response">HttpResponse.</param>
@@ -130,30 +154,6 @@ namespace LMS.System.Blazor.Authenticate
             // Append cookies to response
             response.Cookies.Append(AuthConst.AccessToken, accessToken, accessTokenOptions);
             response.Cookies.Append(AuthConst.RefreshToken, refreshToken, refreshTokenOptions);
-
-            // Notify authentication state change
-            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-        }
-
-        /// <summary>
-        /// Clear authentication cookies (logout).
-        /// </summary>
-        private void ClearAuthCookies()
-        {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext != null)
-            {
-                // Revoke refresh token from database
-                var refreshToken = httpContext.Request.Cookies[AuthConst.RefreshToken];
-                if (!string.IsNullOrEmpty(refreshToken))
-                {
-                    _ = _authService.RevokeRefreshTokenAsync(refreshToken);
-                }
-
-                // Remove cookies from response
-                httpContext.Response.Cookies.Delete(AuthConst.AccessToken);
-                httpContext.Response.Cookies.Delete(AuthConst.RefreshToken);
-            }
 
             // Notify authentication state change
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
