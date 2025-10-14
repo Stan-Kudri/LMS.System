@@ -51,7 +51,7 @@ namespace LMS.System.Blazor.Authenticate
             }
 
             // Set cookies.
-            Response.Cookies.Append("accessToken", result.AccessToken, new CookieOptions
+            Response.Cookies.Append(AuthConst.AccessToken, result.AccessToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
@@ -59,7 +59,7 @@ namespace LMS.System.Blazor.Authenticate
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15),
             });
 
-            Response.Cookies.Append("refreshToken", result.RefreshToken, new CookieOptions
+            Response.Cookies.Append(AuthConst.RefreshToken, result.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
@@ -77,8 +77,8 @@ namespace LMS.System.Blazor.Authenticate
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("accessToken");
-            Response.Cookies.Delete("refreshToken");
+            Response.Cookies.Delete(AuthConst.AccessToken);
+            Response.Cookies.Delete(AuthConst.RefreshToken);
             return Ok();
         }
     }

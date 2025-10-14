@@ -34,7 +34,7 @@ namespace LMS.System.Domain.Enums
 
         // Ef constructors
         private AssignmentType()
-            : base("", 0)
+            : base(string.Empty, 0)
         {
         }
     }

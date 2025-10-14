@@ -29,7 +29,7 @@ namespace LMS.System.Domain.Enums
 
         // Ef constructors
         private QuestionType()
-            : base("", 0)
+            : base(string.Empty, 0)
         {
         }
     }

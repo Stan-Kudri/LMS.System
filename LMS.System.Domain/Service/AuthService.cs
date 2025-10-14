@@ -153,6 +153,7 @@ namespace LMS.System.Domain.Service
         /// Revokes a refresh token (logout).
         /// </summary>
         /// <param name="refreshToken">Refresh token to revoke.</param>
+        /// <returns><see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task RevokeRefreshTokenAsync(string refreshToken)
         {
             var token = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == refreshToken)

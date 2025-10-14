@@ -35,7 +35,7 @@ namespace LMS.System.Domain.Enums
 
         // Ef constructors
         private UserRole()
-            : base("", 0)
+            : base(string.Empty, 0)
         {
         }
     }

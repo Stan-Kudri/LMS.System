@@ -19,7 +19,7 @@ namespace LMS.System.Domain.Extension
         /// <summary>
         /// Has conversion SmartEnum<typeparamref name="T"/>.
         /// </summary>
-        /// <typeparam value="T">Entity.</typeparam>
+        /// <typeparam value="T" name="T">Entity.</typeparam>
         /// <param name="type">Builder configuration.</param>
         public static void SmartEnumValueConversion<T>(this PropertyBuilder<T> type)
             where T : SmartEnum<T> => type.HasConversion(x => x.Value, x => SmartEnum<T>.FromValue(x));
