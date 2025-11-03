@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using LMS.System.Domain.Model.Users;
+using LMS.System.Infrastructure.Authenticates;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -43,7 +44,7 @@ namespace LMS.System.Domain.Service
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = _timeProvider.GetUtcNow().UtcDateTime.AddMinutes(15),
+                Expires = _timeProvider.GetUtcNow().UtcDateTime.AddMinutes(AuthConst.AccessTokenExpiryMinute),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                 Issuer = _configuration["Jwt:Issuer"],
                 Audience = _configuration["Jwt:Audience"],
@@ -98,9 +99,6 @@ namespace LMS.System.Domain.Service
         /// </summary>
         /// <returns>Expiration datetime.</returns>
         public DateTime GetRefreshTokenExpiryTime()
-        {
-            var days = int.Parse(_configuration["Jwt:RefreshTokenExpiryDays"] ?? "7");
-            return _timeProvider.GetUtcNow().UtcDateTime.AddDays(days);
-        }
+            => _timeProvider.GetUtcNow().UtcDateTime.AddDays(AuthConst.AccessTokenExpiryMinute);
     }
 }

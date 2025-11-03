@@ -82,7 +82,7 @@ namespace LMS.System.Domain.Service
             };
 
             _context.RefreshTokens.Add(refreshTokenEntity);
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            await _context.SaveChangesAsync();
 
             return new AuthResult
             {

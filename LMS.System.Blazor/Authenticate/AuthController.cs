@@ -1,6 +1,10 @@
+using LMS.System.Blazor.Components.Pages;
 using LMS.System.Domain.Service;
+using LMS.System.Infrastructure.Authenticates;
+using LMS.System.Infrastructure.Extension;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace LMS.System.Blazor.Authenticate
 {
@@ -34,7 +38,7 @@ namespace LMS.System.Blazor.Authenticate
                 {
                     Success = false,
                     Message = "Invalid request data",
-                    Errors = ModelState.Values.SelectMany(v => v.Errors),
+                    Errors = ModelState.Values.SelectMany(request => request.Errors),
                 });
             }
 
@@ -51,21 +55,8 @@ namespace LMS.System.Blazor.Authenticate
             }
 
             // Set cookies.
-            Response.Cookies.Append(AuthConst.AccessToken, result.AccessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(15),
-            });
-
-            Response.Cookies.Append(AuthConst.RefreshToken, result.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(7),
-            });
+            HttpContext.AppendAccessToken(result.AccessToken);
+            HttpContext.AppendRefreshToken(result.RefreshToken);
 
             return Ok(new { Success = true, User = new { result.User.Id, result.User.Email, result.User.FirstName } });
         }
@@ -77,8 +68,7 @@ namespace LMS.System.Blazor.Authenticate
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete(AuthConst.AccessToken);
-            Response.Cookies.Delete(AuthConst.RefreshToken);
+            HttpContext.RemoveAllTokens();
             return Ok();
         }
     }

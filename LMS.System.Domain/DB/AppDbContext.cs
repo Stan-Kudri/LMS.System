@@ -86,8 +86,12 @@ namespace LMS.System.Domain.DB
         /// <summary>
         /// Is typically called only once when the first instance of a derived DbContext is created.
         /// </summary>
+        /// <param name="modelBuilder">Model builder.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-           => modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+        {
+            ArgumentNullException.ThrowIfNull(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserConfiguration).Assembly);
+        }
 
         /// <summary>
         /// Updates CreatedAt and UpdatedAt for new and modified entities.

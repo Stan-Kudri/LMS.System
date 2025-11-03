@@ -8,6 +8,7 @@ using LMS.System.Migrations.SQLite;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +48,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 
 // Register custom services
+builder.Services.AddScoped(privider => privider.GetRequiredService<IHttpContextAccessor>().HttpContext
+                                       ?? throw new InvalidOperationException("HttpContext is not available. Ensure the method is called within an HTTP request context."));
 builder.Services.AddScoped<PasswordHasher>();
 builder.Services.AddScoped<JwtTokenService>();
 builder.Services.AddScoped<AuthService>();

@@ -29,6 +29,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\LMS.System.Domain\LMS.System.Domain.csproj" />
+      <ProjectReference Include="..\LMS.System.Infrastructure\LMS.System.Infrastructure.csproj" />
       <ProjectReference Include="..\LMS.System.Migrations.SQLite\LMS.System.Migrations.SQLite.csproj" />
     </ItemGroup>
 </Project>

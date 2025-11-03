@@ -86,7 +86,6 @@
 
 	private async Task HandleLogin()
 	{
-		isLoading = true;
 		errorMessage = string.Empty;
 		StateHasChanged();
 
@@ -120,7 +119,6 @@
 		}
 		finally
 		{
-			isLoading = false;
 			StateHasChanged();
 		}
 	}

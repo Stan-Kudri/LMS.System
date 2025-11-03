@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using LMS.System.Domain.Service;
+using LMS.System.Infrastructure.Authenticates;
+using LMS.System.Infrastructure.Extension;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace LMS.System.Blazor.Authenticate
@@ -9,18 +11,18 @@ namespace LMS.System.Blazor.Authenticate
     /// </summary>
     public class CookieAuthStateProvider : AuthenticationStateProvider
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly HttpContext _httpContext;
         private readonly AuthService _authService;
         private readonly JwtTokenService _tokenService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CookieAuthStateProvider"/> class.
         /// </summary>
-        /// <param name="httpContextAccessor">DB Context.</param>
+        /// <param name="httpContext">DB context accessor.</param>
         /// <param name="authService">Authenticate service.</param>
-        public CookieAuthStateProvider(IHttpContextAccessor httpContextAccessor, AuthService authService)
+        public CookieAuthStateProvider(HttpContext httpContext, AuthService authService)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _httpContext = httpContext;
             _authService = authService;
 
             // Initialize JWT token service with configuration
@@ -34,23 +36,19 @@ namespace LMS.System.Blazor.Authenticate
         /// <returns>AuthenticationState.</returns>
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null)
-            {
-                return new AuthenticationState(new ClaimsPrincipal());
-            }
-
-            // Read tokens from cookies
-            var accessToken = httpContext.Request.Cookies[AuthConst.AccessToken];
-            var refreshToken = httpContext.Request.Cookies[AuthConst.RefreshToken];
-
-            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
-            {
-                return new AuthenticationState(new ClaimsPrincipal());
-            }
-
             try
             {
+                var access = _httpContext.GetAccessToken();
+                var refresh = _httpContext.GetRefreshToken();
+                // Read tokens from cookies
+                var accessToken = _httpContext.Request.Cookies[AuthConst.AccessToken];
+                var refreshToken = _httpContext.Request.Cookies[AuthConst.RefreshToken];
+
+                if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+                {
+                    return new AuthenticationState(new ClaimsPrincipal());
+                }
+
                 // Validate tokens and create authentication state
                 var principal = await GetPrincipalFromTokensAsync(accessToken, refreshToken);
                 return new AuthenticationState(principal);
@@ -82,10 +80,9 @@ namespace LMS.System.Blazor.Authenticate
             var authResult = await _authService.RefreshTokenAsync(accessToken, refreshToken);
             if (authResult != null)
             {
-                var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext != null)
+                if (_httpContext != null)
                 {
-                    SetAuthCookies(httpContext.Response, authResult.AccessToken, authResult.RefreshToken);
+                    SetAuthCookies(_httpContext, authResult.AccessToken, authResult.RefreshToken);
                 }
 
                 principal = _tokenService.GetPrincipalFromExpiredToken(authResult.AccessToken);
@@ -99,19 +96,17 @@ namespace LMS.System.Blazor.Authenticate
         /// </summary>
         public void ClearAuthCookies()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext != null)
+            if (_httpContext != null)
             {
                 // Revoke refresh token from database
-                var refreshToken = httpContext.Request.Cookies[AuthConst.RefreshToken];
+                var refreshToken = _httpContext.Request.Cookies[AuthConst.RefreshToken];
                 if (!string.IsNullOrEmpty(refreshToken))
                 {
                     _ = _authService.RevokeRefreshTokenAsync(refreshToken);
                 }
 
                 // Remove cookies from response
-                httpContext.Response.Cookies.Delete(AuthConst.AccessToken);
-                httpContext.Response.Cookies.Delete(AuthConst.RefreshToken);
+                _httpContext.RemoveAllTokens();
             }
 
             // Notify authentication state change
@@ -121,39 +116,15 @@ namespace LMS.System.Blazor.Authenticate
         /// <summary>
         /// Set authentication cookies in HTTP response.
         /// </summary>
-        /// <param name="response">HttpResponse.</param>
+        /// <param name="httpContext">HTTP request context.</param>
         /// <param name="accessToken">Access Token.</param>
         /// <param name="refreshToken">Refresh Token.</param>
         /// <exception cref="InvalidOperationException">The response has already started, cannot set cookies.</exception>
-        private void SetAuthCookies(HttpResponse response, string accessToken, string refreshToken)
+        private void SetAuthCookies(HttpContext httpContext, string accessToken, string refreshToken)
         {
-            // Check if response has already started to avoid exceptions
-            if (response.HasStarted)
-            {
-                throw new InvalidOperationException("The response has already started, cannot set cookies.");
-            }
-
-            // Configure access token cookie options
-            var accessTokenOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(15),
-            };
-
-            // Configure refresh token cookie options
-            var refreshTokenOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(7),
-            };
-
-            // Append cookies to response
-            response.Cookies.Append(AuthConst.AccessToken, accessToken, accessTokenOptions);
-            response.Cookies.Append(AuthConst.RefreshToken, refreshToken, refreshTokenOptions);
+            // Set cookies.
+            httpContext.AppendAccessToken(accessToken);
+            httpContext.AppendRefreshToken(refreshToken);
 
             // Notify authentication state change
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());

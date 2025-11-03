@@ -164,9 +164,9 @@
 			{
 				Id = userId,
 				FirstName = principal.FindFirst(ClaimTypes.GivenName)?.Value ?? "User",
-				LastName = principal.FindFirst(ClaimTypes.Surname)?.Value ?? "",
-				Email = principal.FindFirst(ClaimTypes.Email)?.Value ?? "",
-				UserRole = UserRole.Student,
+				LastName = principal.FindFirst(ClaimTypes.Surname)?.Value ?? string.Empty,
+				Email = principal.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty,
+				UserRole = UserRole.FromName(principal.FindFirst(ClaimTypes.Role)?.Value) ?? UserRole.Student,
 				PasswordHash = string.Empty,
 			};
 			Console.WriteLine($"User loaded from claims: {user.FirstName}");
