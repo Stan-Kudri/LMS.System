@@ -21,19 +21,23 @@ namespace LMS.System.Domain.DB.Configuration
         protected override void ConfigureModel(EntityTypeBuilder<RefreshToken> builder)
         {
             builder.ToTable("refresh_token");
-            builder.Property(e => e.Token).IsRequired()
+            builder.Property(rt => rt.Token).IsRequired()
                                           .HasColumnName("token")
                                           .HasMaxLength(256);
-            builder.Property(e => e.Expires).IsRequired().HasColumnName("expires");
-            builder.Property(e => e.IsRevoked).IsRequired()
+            builder.Property(rt => rt.Expires).IsRequired().HasColumnName("expires");
+            builder.Property(rt => rt.IsRevoked).IsRequired()
                                               .HasColumnName("is_revoked")
                                               .HasDefaultValue(false);
-            builder.Property(e => e.UserId).IsRequired().HasColumnName("user_id");
-            builder.HasOne(rt => rt.User).WithMany(e => e.RefreshTokens)
+            builder.Property(rt => rt.UserId).IsRequired().HasColumnName("user_id");
+            builder.HasOne(rt => rt.User).WithMany(user => user.RefreshTokens)
                                          .HasForeignKey(rt => rt.UserId)
                                          .OnDelete(DeleteBehavior.Cascade);
-            builder.HasIndex(e => e.Token).IsUnique();
-            builder.HasIndex(e => e.UserId);
+            builder.HasIndex(rt => rt.Token).IsUnique();
+            builder.HasIndex(rt => rt.UserId);
+            builder.HasIndex(rt => rt.Expires); // To search for expired tokens.
+            builder.HasIndex(rt => rt.IsRevoked); // To search for revoked tokens.
+            builder.HasIndex(rt => new { rt.Expires, rt.IsRevoked }); // Composite index.
+            builder.HasIndex(rt => rt.CreatedAt); // To clear by creation time.
         }
     }
 }

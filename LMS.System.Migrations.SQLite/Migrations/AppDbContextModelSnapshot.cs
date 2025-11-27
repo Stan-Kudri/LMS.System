@@ -15,7 +15,7 @@ namespace LMS.System.Migrations.SQLite.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
 
             modelBuilder.Entity("LMS.System.Domain.Model.Category", b =>
                 {
@@ -455,10 +455,18 @@ namespace LMS.System.Migrations.SQLite.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Expires");
+
+                    b.HasIndex("IsRevoked");
+
                     b.HasIndex("Token")
                         .IsUnique();
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("Expires", "IsRevoked");
 
                     b.ToTable("refresh_token", (string)null);
                 });

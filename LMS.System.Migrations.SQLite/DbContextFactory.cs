@@ -12,8 +12,9 @@ namespace LMS.System.Migrations.SQLite
                                 .UseSqlite($"Data Source={connectionName}.db",
                                            e => e.MigrationsAssembly(typeof(DbContextFactoryMigration).Assembly.FullName))
                                 .Options;
-
-            return new AppDbContext(options, dateTimeProvider);
+            var dbContext = new AppDbContext(options, dateTimeProvider);
+            dbContext.Database.Migrate();
+            return dbContext;
         }
     }
 }

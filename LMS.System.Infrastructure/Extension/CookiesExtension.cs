@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using LMS.System.Infrastructure.Authenticates;
+using LMS.System.Infrastructure.Authenticates.Constants;
 using Microsoft.AspNetCore.Http;
 
 namespace LMS.System.Infrastructure.Extension
@@ -14,45 +14,52 @@ namespace LMS.System.Infrastructure.Extension
     /// </summary>
     public static class CookiesExtension
     {
-        private static readonly CookieOptions _optionToken = new CookieOptions()
+        private static CookieOptions CreateTokenCookieOptions()
         {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTimeOffset.UtcNow.AddMinutes(AuthConst.AccessTokenExpiryMinute),
-        };
+            return new CookieOptions()
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(AuthConst.AccessTokenExpiryMinute),
+            };
+        }
 
-        private static readonly CookieOptions _optionRefreshToken = new CookieOptions()
+        private static CookieOptions CreateRefreshTokenCookieOptions()
         {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTimeOffset.UtcNow.AddDays(AuthConst.RefreshTokenExpiryDays),
-        };
+            return new CookieOptions()
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(AuthConst.RefreshTokenExpiryDays),
+            };
+        }
 
         /// <summary>
-        /// Add a new cookie.
+        /// Add a new cookie AccessToken.
         /// </summary>
         /// <param name="httpContext">HTTP request context.</param>
         /// <param name="token">Short-lived token for accessing protected resources.</param>
         public static void AppendAccessToken(this HttpContext httpContext, string token)
-            => httpContext.Response.Cookies.Append(AuthConst.AccessToken, token, _optionToken);
+            => httpContext.Response.Cookies.Append(AuthConst.AccessToken, token, CreateTokenCookieOptions());
 
         /// <summary>
-        /// Add a new cookie.
+        /// Add a new cookie RefreshToken.
         /// </summary>
         /// <param name="httpContext">HTTP request context.</param>
         /// <param name="token">Long-lived token for obtaining new access tokens.</param>
         public static void AppendRefreshToken(this HttpContext httpContext, string token)
-            => httpContext.Response.Cookies.Append(AuthConst.RefreshToken, token, _optionRefreshToken);
+            => httpContext.Response.Cookies.Append(AuthConst.RefreshToken, token, CreateRefreshTokenCookieOptions());
 
         /// <summary>
         /// Read cookie access token.
         /// </summary>
         /// <param name="httpContext">HTTP request context.</param>
-        public static string GetAccessToken(this HttpContext httpContext)
+        /// <returns>Access token.</returns>
+        public static string? GetAccessToken(this HttpContext httpContext)
         {
-            httpContext.Request.Cookies.TryGetValue(AuthConst.AccessToken, out string token);
+            httpContext.Request.Cookies.TryGetValue(AuthConst.AccessToken, out string? token);
             return token;
         }
 
@@ -60,9 +67,10 @@ namespace LMS.System.Infrastructure.Extension
         /// Read cookie refresh token.
         /// </summary>
         /// <param name="httpContext">HTTP request context.</param>
-        public static string GetRefreshToken(this HttpContext httpContext)
+        /// <returns>Refresh token.</returns>
+        public static string? GetRefreshToken(this HttpContext httpContext)
         {
-            httpContext.Request.Cookies.TryGetValue(AuthConst.RefreshToken, out string token);
+            httpContext.Request.Cookies.TryGetValue(AuthConst.RefreshToken, out string? token);
             return token;
         }
 

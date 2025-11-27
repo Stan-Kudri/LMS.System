@@ -38,5 +38,11 @@ namespace LMS.System.Domain.Enums
             : base(string.Empty, 0)
         {
         }
+
+        /// <summary>
+        /// Get available roles.
+        /// </summary>
+        /// <returns>Available roles.</returns>
+        public static List<UserRole> GetAvailableRoles() => List.Where(e => e != Admin).ToList();
     }
 }

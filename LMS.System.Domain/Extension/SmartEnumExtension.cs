@@ -1,4 +1,6 @@
 using Ardalis.SmartEnum;
+using LMS.System.Domain.Enums;
+using LMS.System.Domain.Model.Users;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LMS.System.Domain.Extension

@@ -1,0 +1,192 @@
+﻿::deep .registration-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    width: 100%;
+}
+
+::deep .registration-form {
+    max-width: 400px;
+    width: 100%;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: white;
+    margin: 0 auto;
+}
+
+::deep .form-field {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+::deep .registration-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+    ::deep .registration-form input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+::deep .registration-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+    ::deep .registration-form select:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+::deep .form-title {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 20px;
+}
+
+::deep .btn-primary-custom {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+}
+
+    ::deep .btn-primary-custom:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+
+    ::deep .btn-primary-custom:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+::deep .custom-validation-errors {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+::deep .valid {
+    border-color: #28a745 !important;
+    background-color: #f8fff9;
+}
+
+::deep .invalid {
+    border-color: #dc3545 !important;
+    background-color: #fff8f8;
+}
+
+::deep .form-field {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+::deep .registration-form input,
+::deep .registration-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+    ::deep .registration-form input:focus,
+    ::deep .registration-form select:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+::deep .btn-primary-custom {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+}
+
+    ::deep .btn-primary-custom:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+
+    ::deep .btn-primary-custom:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+::deep .validation-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+    width: 100%;
+}
+
+::deep .form-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+    ::deep .registration-form {
+        max-width: 500px;
+        padding: 40px;
+    }
+
+        ::deep .registration-form input,
+        ::deep .registration-form select {
+            font-size: 16px;
+            font-family: 'Times New Roman', serif;
+        }
+
+    ::deep .btn-primary-custom {
+        font-size: 16px;
+        font-family: 'Times New Roman', serif;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+    ::deep .registration-container {
+        padding: 10px;
+    }
+
+    ::deep .registration-form {
+        padding: 20px;
+        max-width: 100%;
+    }
+
+        ::deep .registration-form input,
+        ::deep .registration-form select {
+            font-size: 14px;
+        }
+}

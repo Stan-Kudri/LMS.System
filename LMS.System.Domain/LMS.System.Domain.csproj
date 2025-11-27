@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>Nullable</WarningsAsErrors>
@@ -16,7 +16,7 @@
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
         <PackageReference Include="NSpecifications" Version="1.2.1" />
         <PackageReference Include="Ardalis.SmartEnum" Version="8.2.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
         <PackageReference Include="Scrutor" Version="6.1.0" />
         <PackageReference Include="Serilog" Version="4.3.0" />
         <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\LMS.System.Infrastructure\LMS.System.Infrastructure.csproj" />
+      <Folder Include="Model\Time\" />
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,123 @@
+﻿@page "/registration"
+
+@using LMS.System.BlazorApp.Components.Shared
+@using LMS.System.Domain.Enums
+@using LMS.System.Domain.Model.Users
+@using LMS.System.Infrastructure.Authenticates.Model
+@using LMS.System.Infrastructure.Service
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Forms
+
+@rendermode RenderMode.InteractiveServer
+
+@inject NavigationManager Navigation
+@inject AuthService AuthenticateService
+
+@attribute [AllowAnonymous]
+
+<PageTitle>Registration</PageTitle>
+
+<div class="registration-container">
+    <div class="registration-form">
+		<h3 class="form-title text-center">Registration</h3>
+
+		<EditForm Model="@UserModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="form-field">
+				<InputText @bind-Value="UserModel.Email" id="email"
+                           placeholder="Enter your email" class="form-control" />
+				<ValidationMessage For="@(() => UserModel.Email)" />
+            </div>
+
+            <div class="form-field">
+				<InputText type="password" @bind-Value="UserModel.Password"	id="password"
+                           placeholder="Enter your password" class="form-control" />
+				<ValidationMessage For="@(() => UserModel.Password)" />
+            </div>
+
+            <div class="form-field">
+				<InputText @bind-Value="UserModel.FirstName" id="firstname"
+                           placeholder="Enter your first name" class="form-control" />
+				<ValidationMessage For="@(() => UserModel.FirstName)" />
+            </div>
+
+            <div class="form-field">
+				<InputText @bind-Value="UserModel.LastName"	id="lastname"
+                           placeholder="Enter your last name" class="form-control" />
+				<ValidationMessage For="@(() => UserModel.LastName)" />
+            </div>
+
+            <div class="form-field">
+				<InputSelect @bind-Value="UserModel.UserRole" TValue="UserRole" id="role">
+				@foreach (var role in UserRole.GetAvailableRoles())
+				{
+					<option value="@role">@role.Name</option>
+				}
+				</InputSelect>
+				<ValidationMessage For="@(() => UserModel.UserRole)" />
+            </div>
+
+            @if (ServerErrors?.Any() == true)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var error in ServerErrors)
+                    {
+                        <div>@error</div>
+                    }
+                </div>
+            }
+
+            <LoadingButton IsLoading="@IsLoading" LoadingText="Registering..." NormalText="Register" />
+        </EditForm>
+
+        <div class="login-redirect text-center mt-3">
+            Already have an account? <a href="/login" class="link">Login here</a>
+        </div>
+    </div>
+</div>
+
+
+@code {
+	public string RedirectUrl { get; set; } = "/login";
+
+	UserRequest UserModel { get; set; } = new();
+
+	private bool IsLoading = false;
+	private List<string>? ServerErrors;
+
+	protected override void OnInitialized()
+	{
+	}
+
+	private async Task HandleValidSubmit()
+	{
+		IsLoading = true;
+		StateHasChanged();
+
+		try
+		{
+			var result = await AuthenticateService.RegisterUserAsync(UserModel);
+
+			if (result.ResultErrors == null || result.ResultErrors.Success)
+			{
+				var user = result.User;
+				Navigation.NavigateTo(RedirectUrl, forceLoad: true);
+			}
+			else
+			{
+				ServerErrors = result.ResultErrors!.Errors?.ToList() ?? new List<string> { "Registration failed. Please try again." };
+				StateHasChanged();
+			}
+		}
+		catch (Exception ex)
+		{
+			ServerErrors = new List<string> { $"Registration failed: {ex.Message}" };
+		}
+		finally
+		{
+			StateHasChanged();
+		}
+	}
+}
